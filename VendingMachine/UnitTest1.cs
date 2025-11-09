@@ -54,7 +54,7 @@ public class UnitTest1
     }
     
     [Fact]
-    public void Cuando_InsertanUnaMonedaNickelYUnaPenny_Debe_SaldoMaquinaSer5YNoSumarMonedaDime()
+    public void Cuando_InsertanUnaMonedaNickelYUnaPenny_Debe_SaldoMaquinaSer5YNoSumarMonedaPenny()
     {
         var maquina = new MaquinaExpendedora();
         var nickel = Moneda.Nickel;
@@ -65,18 +65,32 @@ public class UnitTest1
         
         maquina.Saldo.Should().Be(5);
     }
-    
+
+
+    [Fact]
+    public void Cuando_InsertanUnaMonedaNickel_Debe_PantallaMaquinaMostrarSaldo5()
+    {
+        var maquina = new MaquinaExpendedora();
+        var nickel = Moneda.Nickel;
+
+        maquina.InsertarMoneda(nickel);
+
+        maquina.Pantalla.Should().Be("$5");
+    }
     
 }
 
 public class MaquinaExpendedora
 {
     public int Saldo { get; set; }
+    public string Pantalla { get; set; }
 
     public void InsertarMoneda(Moneda moneda)
     {
         if(moneda.Nombre != Moneda.Penny.Nombre)
             Saldo += moneda.Valor;
+
+        Pantalla = "$5";
     }   
 }
 
