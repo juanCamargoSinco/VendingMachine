@@ -36,6 +36,37 @@ public class UnitTest1
 
         maquina.Saldo.Should().Be(25);
     }
+
+    [Fact]
+    public void Cuando_InsertanUnaMonedaNickelUnaDimeYUnaQuarter_Debe_SaldoMaquinaSer40()
+    {
+        var maquina = new MaquinaExpendedora();
+        var nickel = Moneda.Nickel;
+        var dime = Moneda.Dime;
+        var quarter = Moneda.Quarter;
+        
+        maquina.InsertarMoneda(nickel);
+        maquina.InsertarMoneda(dime);
+        maquina.InsertarMoneda(quarter);
+        
+
+        maquina.Saldo.Should().Be(40);
+    }
+    
+    [Fact]
+    public void Cuando_InsertanUnaMonedaNickelYUnaPenny_Debe_SaldoMaquinaSer5YNoSumarMonedaDime()
+    {
+        var maquina = new MaquinaExpendedora();
+        var nickel = Moneda.Nickel;
+        var penny = Moneda.Penny;
+        
+        maquina.InsertarMoneda(nickel);
+        maquina.InsertarMoneda(penny);
+        
+        maquina.Saldo.Should().Be(5);
+    }
+    
+    
 }
 
 public class MaquinaExpendedora
@@ -44,12 +75,8 @@ public class MaquinaExpendedora
 
     public void InsertarMoneda(Moneda moneda)
     {
-        Saldo = 5;
-
-        if (moneda.Nombre == Moneda.Dime.Nombre)
-            Saldo = 10;
-        else if (moneda.Nombre == Moneda.Quarter.Nombre)
-            Saldo = 25;
+        if(moneda.Nombre != Moneda.Penny.Nombre)
+            Saldo += moneda.Valor;
     }   
 }
 
@@ -58,6 +85,7 @@ public class Moneda
     public string Nombre { get; set; }
     public int Valor { get; set; }
 
+    public static readonly Moneda Penny = new() { Nombre = "Penny", Valor = 1 };
     public static readonly Moneda Nickel = new() { Nombre = "Nickel", Valor = 5 };
     public static readonly Moneda Dime = new() { Nombre = "Dime", Valor = 10 };
     public static readonly Moneda Quarter = new() { Nombre = "Quarter", Valor = 25 };
