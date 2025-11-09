@@ -78,6 +78,18 @@ public class UnitTest1
         maquina.Pantalla.Should().Be("$5");
     }
     
+    
+    [Fact]
+    public void Cuando_InsertanUnaMonedaDime_Debe_PantallaMaquinaMostrarSaldo10()
+    {
+        var maquina = new MaquinaExpendedora();
+        var dime = Moneda.Dime;
+
+        maquina.InsertarMoneda(dime);
+
+        maquina.Pantalla.Should().Be("$10");
+    }
+    
 }
 
 public class MaquinaExpendedora
@@ -91,6 +103,9 @@ public class MaquinaExpendedora
             Saldo += moneda.Valor;
 
         Pantalla = "$5";
+        
+        if(moneda.Nombre == Moneda.Dime.Nombre)
+            Pantalla = "$10";
     }   
 }
 
