@@ -143,8 +143,19 @@ public class UnitTest1
 
         maquina.Importe.Should().Be(50);
     }
-
     
+    [Fact]
+    public void Cuando_ImporteMaquinaEs30UsuarioInsertaDosMonedasDimeYSolicitaDevolucionDinero_Debe_ImporteMaquinaVolverA30()
+    {
+        var maquina = new MaquinaExpendedora(Moneda.Dime, Moneda.Dime, Moneda.Dime);
+        var dime = Moneda.Dime;
+        maquina.InsertarMoneda(dime);
+        maquina.InsertarMoneda(dime);
+    
+        maquina.DevolverMonedas();
+    
+        maquina.Importe.Should().Be(30);
+    }
 }
 
 public class MaquinaExpendedora
@@ -170,6 +181,7 @@ public class MaquinaExpendedora
 
     public void DevolverMonedas()
     {
+        Importe -= Saldo;
         Saldo = 0;
         Pantalla = "INSERTAR MONEDA";
     }
