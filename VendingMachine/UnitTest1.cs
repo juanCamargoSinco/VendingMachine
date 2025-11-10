@@ -173,7 +173,8 @@ public class UnitTest1
     public void Cuando_NoHaInsertadoDineroYSeleccionanChips_Debe_PantallaMostrarPrecioChips()
     {
         var importe = new List<Moneda> { Moneda.Dime, Moneda.Dime, Moneda.Dime };
-        var maquina = new MaquinaExpendedora(importe);
+        var inventario = new List<Producto> { Producto.Chips };
+        var maquina = new MaquinaExpendedora(importe, inventario);
 
         maquina.SeleccionarProducto(Producto.Chips);
 
@@ -184,7 +185,8 @@ public class UnitTest1
     public void Cuando_UsuarioInserta50YSeleccionanCandyQueTieneValor65_Debe_PantallaMostrarPrecioCandy()
     {
         var importe = new List<Moneda> { Moneda.Dime, Moneda.Dime, Moneda.Dime };
-        var maquina = new MaquinaExpendedora(importe);
+        var inventario = new List<Producto> { Producto.Candy };
+        var maquina = new MaquinaExpendedora(importe, inventario);
         maquina.InsertarMoneda(Moneda.Quarter);
         maquina.InsertarMoneda(Moneda.Quarter);
 
@@ -197,7 +199,8 @@ public class UnitTest1
     public void Cuando_NoHaInsertadoDineroYSeleccionanCola_Debe_PantallaMostrarPrecioCola()
     {
         var importe = new List<Moneda> { Moneda.Dime, Moneda.Dime, Moneda.Dime };
-        var maquina = new MaquinaExpendedora(importe);
+        var inventario = new List<Producto> { Producto.Cola };
+        var maquina = new MaquinaExpendedora(importe, inventario);
 
         maquina.SeleccionarProducto(Producto.Cola);
 
@@ -208,7 +211,8 @@ public class UnitTest1
     public void Cuando_SaldoEs50YSeSeleccionaChips_Debe_PantallaMostrarGracias()
     {
         var importe = new List<Moneda> { Moneda.Dime, Moneda.Dime, Moneda.Dime };
-        var maquina = new MaquinaExpendedora(importe);
+        var inventario = new List<Producto> { Producto.Chips };
+        var maquina = new MaquinaExpendedora(importe, inventario);
         maquina.InsertarMoneda(Moneda.Quarter);
         maquina.InsertarMoneda(Moneda.Quarter);
 
@@ -221,7 +225,8 @@ public class UnitTest1
     public void Cuando_SaldoEs65YSeSeleccionaCandy_Debe_PantallaMostrarGracias()
     {
         var importe = new List<Moneda> { Moneda.Dime, Moneda.Dime, Moneda.Dime };
-        var maquina = new MaquinaExpendedora(importe);
+        var inventario = new List<Producto> { Producto.Candy };
+        var maquina = new MaquinaExpendedora(importe, inventario);
         maquina.InsertarMoneda(Moneda.Quarter);
         maquina.InsertarMoneda(Moneda.Quarter);
         maquina.InsertarMoneda(Moneda.Dime);
@@ -236,7 +241,8 @@ public class UnitTest1
     public void Cuando_SaldoEs100YSeSeleccionaCola_Debe_PantallaMostrarGracias()
     {
         var importe = new List<Moneda> { Moneda.Dime, Moneda.Dime, Moneda.Dime };
-        var maquina = new MaquinaExpendedora(importe);
+        var inventario = new List<Producto> { Producto.Cola };
+        var maquina = new MaquinaExpendedora(importe, inventario);
         maquina.InsertarMoneda(Moneda.Quarter);
         maquina.InsertarMoneda(Moneda.Quarter);
         maquina.InsertarMoneda(Moneda.Quarter);
@@ -251,7 +257,8 @@ public class UnitTest1
     public void Cuando_SaldoEs100YSeSeleccionaChips_Debe_PantallaMostrarGracias()
     {
         var importe = new List<Moneda> { Moneda.Dime, Moneda.Dime, Moneda.Dime };
-        var maquina = new MaquinaExpendedora(importe);
+        var inventario = new List<Producto> { Producto.Chips };
+        var maquina = new MaquinaExpendedora(importe, inventario);
         maquina.InsertarMoneda(Moneda.Quarter);
         maquina.InsertarMoneda(Moneda.Quarter);
         maquina.InsertarMoneda(Moneda.Quarter);
@@ -266,7 +273,8 @@ public class UnitTest1
     public void Cuando_ImporteEs30SaldoEs75YSeSeleccionaCandy_Debe_SaldoSer0YImporteser95()
     {
         var importe = new List<Moneda> { Moneda.Dime, Moneda.Dime, Moneda.Dime };
-        var maquina = new MaquinaExpendedora(importe);
+        var inventario = new List<Producto> { Producto.Candy };
+        var maquina = new MaquinaExpendedora(importe, inventario);
         maquina.InsertarMoneda(Moneda.Quarter);
         maquina.InsertarMoneda(Moneda.Quarter);
         maquina.InsertarMoneda(Moneda.Quarter);
@@ -291,6 +299,17 @@ public class UnitTest1
 
         maquina.Saldo.Should().Be(0);
         maquina.Inventario.Count(producto => producto.Nombre == Producto.Chips.Nombre).Should().Be(2);
+    }
+    
+    [Fact]
+    public void Cuando_MaquinaEstaSinInvenarioYSeSeleccionaChips_Debe_MostarAgotado()
+    {
+        var importe = new List<Moneda> { Moneda.Quarter, Moneda.Quarter };
+        var maquina = new MaquinaExpendedora(importe);
+
+        maquina.SeleccionarProducto(Producto.Chips);
+
+        maquina.Pantalla.Should().Be("AGOTADO");
     }
 }
 
@@ -330,7 +349,9 @@ public class MaquinaExpendedora
 
     public void SeleccionarProducto(Producto producto)
     {
-        if (Saldo >= producto.Precio)
+        if(Inventario.Count(stock => stock.Nombre == producto.Nombre) == 0)
+            Pantalla = "AGOTADO";
+        else if (Saldo >= producto.Precio)
         {
             Pantalla = MensajeGracias;
             int cambio = Saldo - producto.Precio;
@@ -340,6 +361,8 @@ public class MaquinaExpendedora
         }
         else
             Pantalla = EstablecerPrecio(producto.Precio);
+        
+
     }
 
     private static string EstablecerPrecio(int precio) => $"PRECIO ${precio}";
