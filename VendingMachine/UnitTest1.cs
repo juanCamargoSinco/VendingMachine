@@ -118,7 +118,7 @@ public class UnitTest1
         maquina.DevolverMonedas();
         
         maquina.Saldo.Should().Be(0);
-        maquina.Pantalla.Should().Be(MaquinaExpendedora.InsertarMonedaMensaje);
+        maquina.Pantalla.Should().Be(MaquinaExpendedora.MensajeInsertarMoneda);
     }
 
     [Fact]
@@ -162,7 +162,7 @@ public class UnitTest1
     {
         var maquina = new MaquinaExpendedora(Moneda.Dime, Moneda.Dime, Moneda.Dime);
     
-        maquina.Pantalla.Should().Be(MaquinaExpendedora.InsertarMonedaMensaje);
+        maquina.Pantalla.Should().Be(MaquinaExpendedora.MensajeInsertarMoneda);
     }
     
     [Fact]
@@ -220,7 +220,7 @@ public class UnitTest1
     
         maquina.SeleccionarProducto(Producto.Candy);
     
-        maquina.Pantalla.Should().Be("THANK YOU");
+        maquina.Pantalla.Should().Be(MaquinaExpendedora.MensajeGracias);
     }
     
     [Fact]
@@ -234,15 +234,29 @@ public class UnitTest1
     
         maquina.SeleccionarProducto(Producto.Cola);
     
-        maquina.Pantalla.Should().Be("THANK YOU");
+        maquina.Pantalla.Should().Be(MaquinaExpendedora.MensajeGracias);
     }
-
+    
+    [Fact]
+    public void Cuando_SaldoEs100YSeSeleccionaChips_Debe_PantallaMostrarGracias()
+    {
+        var maquina = new MaquinaExpendedora(Moneda.Dime, Moneda.Dime, Moneda.Dime);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+    
+        maquina.SeleccionarProducto(Producto.Chips);
+    
+        maquina.Pantalla.Should().Be(MaquinaExpendedora.MensajeGracias);
+    }
     
 }
 
 public class MaquinaExpendedora
 {
-    public static readonly string InsertarMonedaMensaje = "INSERTAR MONEDA";
+    public static readonly string MensajeInsertarMoneda = "INSERTAR MONEDA";
+    public static readonly string MensajeGracias = "THANK YOU";
 
     public int Saldo { get; set; }
     public string Pantalla { get; set; }
@@ -251,7 +265,7 @@ public class MaquinaExpendedora
     public MaquinaExpendedora(params Moneda[] importe)
     {
         Importe = importe.Sum(moneda => moneda.Valor);
-        Pantalla = InsertarMonedaMensaje;
+        Pantalla = MensajeInsertarMoneda;
     }
 
     public void InsertarMoneda(Moneda moneda)
@@ -268,17 +282,13 @@ public class MaquinaExpendedora
     {
         Importe -= Saldo;
         Saldo = 0;
-        Pantalla = InsertarMonedaMensaje;
+        Pantalla = MensajeInsertarMoneda;
     }
 
     public void SeleccionarProducto(Producto producto)
     {
-        if (producto.Nombre == Producto.Chips.Nombre && Saldo == 50)
-            Pantalla = "THANK YOU";
-        else if (producto.Nombre == Producto.Candy.Nombre && Saldo == 65)
-            Pantalla = "THANK YOU";
-        else if (producto.Nombre == Producto.Cola.Nombre && Saldo == 100)
-            Pantalla = "THANK YOU";
+        if(Saldo >= producto.Precio)
+            Pantalla = MensajeGracias;
         else
             Pantalla = EstablecerPrecio(producto.Precio);
     }
