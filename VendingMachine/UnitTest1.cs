@@ -223,6 +223,19 @@ public class UnitTest1
         maquina.Pantalla.Should().Be("THANK YOU");
     }
     
+    [Fact]
+    public void Cuando_SaldoEs100YSeSeleccionaCola_Debe_PantallaMostrarGracias()
+    {
+        var maquina = new MaquinaExpendedora(Moneda.Dime, Moneda.Dime, Moneda.Dime);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+    
+        maquina.SeleccionarProducto(Producto.Cola);
+    
+        maquina.Pantalla.Should().Be("THANK YOU");
+    }
 
     
 }
@@ -263,6 +276,8 @@ public class MaquinaExpendedora
         if (producto.Nombre == Producto.Chips.Nombre && Saldo == 50)
             Pantalla = "THANK YOU";
         else if (producto.Nombre == Producto.Candy.Nombre && Saldo == 65)
+            Pantalla = "THANK YOU";
+        else if (producto.Nombre == Producto.Cola.Nombre && Saldo == 100)
             Pantalla = "THANK YOU";
         else
             Pantalla = EstablecerPrecio(producto.Precio);
