@@ -118,7 +118,7 @@ public class UnitTest1
         maquina.DevolverMonedas();
         
         maquina.Saldo.Should().Be(0);
-        maquina.Pantalla.Should().Be("INSERTAR MONEDA");
+        maquina.Pantalla.Should().Be(MaquinaExpendedora.InsertarMonedaMensaje);
     }
 
     [Fact]
@@ -162,19 +162,54 @@ public class UnitTest1
     {
         var maquina = new MaquinaExpendedora(Moneda.Dime, Moneda.Dime, Moneda.Dime);
     
-        maquina.Pantalla.Should().Be("INSERTAR MONEDA");
+        maquina.Pantalla.Should().Be(MaquinaExpendedora.InsertarMonedaMensaje);
+    }
+    
+    [Fact]
+    public void Cuando_NoHaInsertadoDineroYSeleccionanChips_Debe_PantallaMostrarPrecioChips()
+    {
+        var maquina = new MaquinaExpendedora(Moneda.Dime, Moneda.Dime, Moneda.Dime);
+    
+        maquina.SeleccionarProducto(Producto.Chips);
+    
+        maquina.Pantalla.Should().Be("PRECIO $50");
+    }
+    
+    [Fact]
+    public void Cuando_UsuarioInserta50YSeleccionanCandyQueTieneValor65_Debe_PantallaMostrarPrecioCandy()
+    {
+        var maquina = new MaquinaExpendedora(Moneda.Dime, Moneda.Dime, Moneda.Dime);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+    
+        maquina.SeleccionarProducto(Producto.Candy);
+    
+        maquina.Pantalla.Should().Be("PRECIO $65");
+    }
+    
+    [Fact]
+    public void Cuando_NoHaInsertadoDineroYSeleccionanCola_Debe_PantallaMostrarPrecioCola()
+    {
+        var maquina = new MaquinaExpendedora(Moneda.Dime, Moneda.Dime, Moneda.Dime);
+    
+        maquina.SeleccionarProducto(Producto.Cola);
+    
+        maquina.Pantalla.Should().Be("PRECIO $100");
     }
 }
 
 public class MaquinaExpendedora
 {
+    public static readonly string InsertarMonedaMensaje = "INSERTAR MONEDA";
+
     public int Saldo { get; set; }
-    public string Pantalla { get; set; } = "INSERTAR MONEDA";
+    public string Pantalla { get; set; }
     public int Importe { get; set; }
 
     public MaquinaExpendedora(params Moneda[] importe)
     {
         Importe = importe.Sum(moneda => moneda.Valor);
+        Pantalla = InsertarMonedaMensaje;
     }
 
     public void InsertarMoneda(Moneda moneda)
@@ -191,7 +226,16 @@ public class MaquinaExpendedora
     {
         Importe -= Saldo;
         Saldo = 0;
-        Pantalla = "INSERTAR MONEDA";
+        Pantalla = InsertarMonedaMensaje;
+    }
+
+    public void SeleccionarProducto(Producto producto)
+    {
+        Pantalla = "PRECIO $50";
+        if(producto.Nombre == Producto.Candy.Nombre)
+            Pantalla = "PRECIO $65";
+        else if(producto.Nombre == Producto.Cola.Nombre)
+            Pantalla = "PRECIO $100";
     }
 }
 
@@ -204,4 +248,15 @@ public class Moneda
     public static readonly Moneda Nickel = new() { Nombre = "Nickel", Valor = 5 };
     public static readonly Moneda Dime = new() { Nombre = "Dime", Valor = 10 };
     public static readonly Moneda Quarter = new() { Nombre = "Quarter", Valor = 25 };
+}
+
+
+public class Producto
+{
+    public string Nombre { get; set; }
+    public int Precio { get; set; }
+
+    public static readonly Producto Cola = new() { Nombre = "Cola", Precio = 100 };
+    public static readonly Producto Candy = new() { Nombre = "Candy", Precio = 65 };
+    public static readonly Producto Chips = new() { Nombre = "Chips", Precio = 50 };
 }
