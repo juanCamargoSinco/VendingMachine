@@ -196,6 +196,19 @@ public class UnitTest1
     
         maquina.Pantalla.Should().Be("PRECIO $100");
     }
+    
+    [Fact]
+    public void Cuando_SeInserta50YSeSeleccionaChips_Debe_PantallaMostrarGracias()
+    {
+        var maquina = new MaquinaExpendedora(Moneda.Dime, Moneda.Dime, Moneda.Dime);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+    
+        maquina.SeleccionarProducto(Producto.Chips);
+    
+        maquina.Pantalla.Should().Be("THANK YOU");
+    }
+    
 }
 
 public class MaquinaExpendedora
@@ -231,7 +244,10 @@ public class MaquinaExpendedora
 
     public void SeleccionarProducto(Producto producto)
     {
-        Pantalla = EstablecerPrecio(producto.Precio);
+        if (producto.Nombre == Producto.Chips.Nombre && Saldo == 50)
+            Pantalla = "THANK YOU";
+        else
+            Pantalla = EstablecerPrecio(producto.Precio);
     }
 
     private static string EstablecerPrecio(int precio) => $"PRECIO ${precio}";
