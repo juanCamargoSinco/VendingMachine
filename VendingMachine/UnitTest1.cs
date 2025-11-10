@@ -231,12 +231,10 @@ public class MaquinaExpendedora
 
     public void SeleccionarProducto(Producto producto)
     {
-        Pantalla = "PRECIO $50";
-        if(producto.Nombre == Producto.Candy.Nombre)
-            Pantalla = "PRECIO $65";
-        else if(producto.Nombre == Producto.Cola.Nombre)
-            Pantalla = "PRECIO $100";
+        Pantalla = EstablecerPrecio(producto.Precio);
     }
+
+    private static string EstablecerPrecio(int precio) => $"PRECIO ${precio}";
 }
 
 public class Moneda
