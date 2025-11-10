@@ -198,7 +198,7 @@ public class UnitTest1
     }
     
     [Fact]
-    public void Cuando_SeInserta50YSeSeleccionaChips_Debe_PantallaMostrarGracias()
+    public void Cuando_SaldoEs50YSeSeleccionaChips_Debe_PantallaMostrarGracias()
     {
         var maquina = new MaquinaExpendedora(Moneda.Dime, Moneda.Dime, Moneda.Dime);
         maquina.InsertarMoneda(Moneda.Quarter);
@@ -208,6 +208,22 @@ public class UnitTest1
     
         maquina.Pantalla.Should().Be("THANK YOU");
     }
+    
+    [Fact]
+    public void Cuando_SaldoEs65YSeSeleccionaCandy_Debe_PantallaMostrarGracias()
+    {
+        var maquina = new MaquinaExpendedora(Moneda.Dime, Moneda.Dime, Moneda.Dime);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Dime);
+        maquina.InsertarMoneda(Moneda.Nickel);
+    
+        maquina.SeleccionarProducto(Producto.Candy);
+    
+        maquina.Pantalla.Should().Be("THANK YOU");
+    }
+    
+
     
 }
 
@@ -245,6 +261,8 @@ public class MaquinaExpendedora
     public void SeleccionarProducto(Producto producto)
     {
         if (producto.Nombre == Producto.Chips.Nombre && Saldo == 50)
+            Pantalla = "THANK YOU";
+        else if (producto.Nombre == Producto.Candy.Nombre && Saldo == 65)
             Pantalla = "THANK YOU";
         else
             Pantalla = EstablecerPrecio(producto.Precio);
