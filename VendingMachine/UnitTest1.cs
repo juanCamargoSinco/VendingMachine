@@ -65,8 +65,7 @@ public class UnitTest1
         
         maquina.Saldo.Should().Be(5);
     }
-
-
+    
     [Fact]
     public void Cuando_InsertanUnaMonedaNickel_Debe_PantallaMaquinaMostrarSaldo5()
     {
@@ -102,7 +101,6 @@ public class UnitTest1
         maquina.InsertarMoneda(dime);
         maquina.InsertarMoneda(quarter);
         
-
         maquina.Pantalla.Should().Be("$40");
     }
 
@@ -119,9 +117,19 @@ public class UnitTest1
 
         maquina.DevolverMonedas();
         
-
         maquina.Saldo.Should().Be(0);
         maquina.Pantalla.Should().Be("INSERTAR MONEDA");
+    }
+
+    [Fact]
+    public void Cuando_InsertanUnaMonedaDime_Debe_AumentarImporteMaquinaEn10()
+    {
+        var maquina = new MaquinaExpendedora();
+        var dime = Moneda.Dime;
+
+        maquina.InsertarMoneda(dime);
+
+        maquina.Importe.Should().Be(10);
     }
     
 }
@@ -130,6 +138,7 @@ public class MaquinaExpendedora
 {
     public int Saldo { get; set; }
     public string Pantalla { get; set; }
+    public int Importe { get; set; }
 
     public void InsertarMoneda(Moneda moneda)
     {
@@ -137,6 +146,7 @@ public class MaquinaExpendedora
         {
             Saldo += moneda.Valor;
             Pantalla = $"${Saldo}";
+            Importe += Saldo;
         }
     }
 
