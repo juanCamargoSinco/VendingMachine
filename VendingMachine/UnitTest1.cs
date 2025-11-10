@@ -156,12 +156,20 @@ public class UnitTest1
     
         maquina.Importe.Should().Be(30);
     }
+    
+    [Fact]
+    public void Cuando_NoSeHaInsertadoDinero_Debe_PantallaMostrarINSERTARMONEDA()
+    {
+        var maquina = new MaquinaExpendedora(Moneda.Dime, Moneda.Dime, Moneda.Dime);
+    
+        maquina.Pantalla.Should().Be("INSERTAR MONEDA");
+    }
 }
 
 public class MaquinaExpendedora
 {
     public int Saldo { get; set; }
-    public string Pantalla { get; set; }
+    public string Pantalla { get; set; } = "INSERTAR MONEDA";
     public int Importe { get; set; }
 
     public MaquinaExpendedora(params Moneda[] importe)
