@@ -132,6 +132,19 @@ public class UnitTest1
         maquina.Importe.Should().Be(10);
     }
     
+    [Fact]
+    public void Cuando_ImporteMaquinaEs30YInsertanDosMonedasDime_Debe_AumentarImporteMaquinaEn20YSer50()
+    {
+        var maquina = new MaquinaExpendedora(Moneda.Dime, Moneda.Dime, Moneda.Dime);
+        var dime = Moneda.Dime;
+
+        maquina.InsertarMoneda(dime);
+        maquina.InsertarMoneda(dime);
+
+        maquina.Importe.Should().Be(50);
+    }
+
+    
 }
 
 public class MaquinaExpendedora
@@ -140,13 +153,18 @@ public class MaquinaExpendedora
     public string Pantalla { get; set; }
     public int Importe { get; set; }
 
+    public MaquinaExpendedora(params Moneda[] importe)
+    {
+        Importe = importe.Sum(moneda => moneda.Valor);
+    }
+
     public void InsertarMoneda(Moneda moneda)
     {
         if (moneda.Nombre != Moneda.Penny.Nombre)
         {
             Saldo += moneda.Valor;
             Pantalla = $"${Saldo}";
-            Importe += Saldo;
+            Importe += moneda.Valor;
         }
     }
 
