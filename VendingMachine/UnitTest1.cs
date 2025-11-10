@@ -251,6 +251,20 @@ public class UnitTest1
         maquina.Pantalla.Should().Be(MaquinaExpendedora.MensajeGracias);
     }
     
+    [Fact]
+    public void Cuando_ImporteEs30SaldoEs75YSeSeleccionaCandy_Debe_SaldoSer0YImporteser95()
+    {
+        var maquina = new MaquinaExpendedora(Moneda.Dime, Moneda.Dime, Moneda.Dime);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+    
+        maquina.SeleccionarProducto(Producto.Candy);
+    
+        maquina.Saldo.Should().Be(0);
+        maquina.Importe.Should().Be(95);
+    }
+    
 }
 
 public class MaquinaExpendedora
@@ -287,8 +301,13 @@ public class MaquinaExpendedora
 
     public void SeleccionarProducto(Producto producto)
     {
-        if(Saldo >= producto.Precio)
+        if (Saldo >= producto.Precio)
+        {
             Pantalla = MensajeGracias;
+            int ganancias = Saldo - producto.Precio ;
+            Importe -= ganancias;
+            Saldo = 0;
+        }
         else
             Pantalla = EstablecerPrecio(producto.Precio);
     }
