@@ -155,7 +155,7 @@ public class VendingMachineTests
     [Fact]
     public void Cuando_UsuarioInserta70YSeleccionaCandy_Debe_PantallaMostrarGraciasDispensarCandyYEntregar5Cambio()
     {
-        var maquina = new VendingMachine(0,0,3);
+        var maquina = new VendingMachine(0,0,3,1);
         maquina.InsertarMoneda(Moneda.Quarter);
         maquina.InsertarMoneda(Moneda.Quarter);
         maquina.InsertarMoneda(Moneda.Dime);
@@ -171,7 +171,7 @@ public class VendingMachineTests
     [Fact]
     public void Cuando_UsuarioInserta90YSeleccionaChips_Debe_PantallaMostrarGraciasDispensarChipsYEntregar40Cambio()
     {
-        var maquina = new VendingMachine(5);
+        var maquina = new VendingMachine(5,0,0,0,10,0);
         maquina.InsertarMoneda(Moneda.Quarter);
         maquina.InsertarMoneda(Moneda.Quarter);
         maquina.InsertarMoneda(Moneda.Quarter);
@@ -186,7 +186,7 @@ public class VendingMachineTests
     }
     
     [Fact]
-    public void Cuando_UsuarioInserta90YSeleccionaDevolverMoneda_Debe_PantallaMostrarInsertarMonedaYEntregar40Cambio()
+    public void Cuando_UsuarioInserta90YSeleccionaDevolverMoneda_Debe_PantallaMostrarInsertarMonedaYEntregar90Cambio()
     {
         var maquina = new VendingMachine();
         maquina.InsertarMoneda(Moneda.Quarter);
@@ -245,6 +245,39 @@ public class VendingMachineTests
 
         maquina.Pantalla.Should().Be("AGOTADO");
     }
+    
+    [Fact]
+    public void Cuando_MaquinaNoTieneDineroUsuarioInserta70YCompraCandy_Debe_PantallaMostrarCambioExacto()
+    {
+        var maquina = new VendingMachine(0,0,1);
+        
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Dime);
+        maquina.InsertarMoneda(Moneda.Dime);
+        
+        maquina.SeleccionarProducto(Producto.Candy);
+
+        maquina.Pantalla.Should().Be("Cambio Exacto");
+    }
+    
+    [Fact]
+    public void Cuando_MaquinaTiene5DineroUsuarioInserta120YCompraCola_Debe_PantallaMostrarCambioExacto()
+    {
+        var maquina = new VendingMachine(0,0,1, 1);
+        
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Dime);
+        maquina.InsertarMoneda(Moneda.Dime);
+        
+        maquina.SeleccionarProducto(Producto.Candy);
+
+        maquina.Pantalla.Should().Be("Cambio Exacto");
+    }
+    
 }
 
 public enum Producto
@@ -256,7 +289,7 @@ public enum Producto
 
 public class VendingMachine
 {
-    public VendingMachine(int cantidadChips = 0, int cantidadCola = 0, int cantidadCandy = 0)
+    public VendingMachine(int cantidadChips = 0, int cantidadCola = 0, int cantidadCandy = 0, int cantidadNickel = 0, int cantidadDime = 0,int cantidadQuarter = 0)
     {
         if (cantidadChips > 0)
         {
@@ -272,6 +305,18 @@ public class VendingMachine
         {
             _inventario[Producto.Candy] = cantidadCandy;
         }
+        if (cantidadDime > 0)
+        {
+            _cajaMonedas[Moneda.Dime] = cantidadDime;
+        }
+        if (cantidadNickel > 0)
+        {
+            _cajaMonedas[Moneda.Nickel] = cantidadNickel;
+        }
+        if (cantidadQuarter > 0)
+        {
+            _cajaMonedas[Moneda.Quarter] = cantidadQuarter;
+        }
         
     }
     private Dictionary<Producto, int> _productos = new()
@@ -286,6 +331,13 @@ public class VendingMachine
         { Producto.Chips, 0 },
         { Producto.Cola, 0 },
         { Producto.Candy, 0 },
+    };
+    
+    private Dictionary<Moneda, int> _cajaMonedas = new()
+    {
+        { Moneda.Dime, 0 },
+        { Moneda.Quarter, 0 },
+        { Moneda.Nickel, 0 },
     };
 
     public string Pantalla { get; private set; }
@@ -328,6 +380,7 @@ public class VendingMachine
 
     public void SeleccionarProducto(Producto producto)
     {
+
         if (_inventario[producto] == 0)
         {
             Pantalla = "AGOTADO";
@@ -335,12 +388,13 @@ public class VendingMachine
         }
         
         var precio = _productos[producto];
+        var vueltas = Saldo - precio;
         if (Saldo >= precio)
         {
             Pantalla = $"Gracias";
             BandejaProductos.Add(producto);
             _inventario[producto] -= 1;
-            var vueltas = Saldo - precio;
+
             if (vueltas > 0)
             {
                 var listaVueltas = ObtenerCambio(vueltas);
@@ -351,7 +405,17 @@ public class VendingMachine
             }
         }
         else
+        {
             Pantalla = $"PRECIO ${precio}";
+            return;
+        }
+            
+        
+        if (PuedeDarCambio(vueltas) == false)
+        {
+            Pantalla = "Cambio Exacto";
+            return;
+        }
         
     }
 
@@ -389,6 +453,25 @@ public class VendingMachine
             BandejaDevolucion.Add(moneda);
         }
         Pantalla = "INSERTAR MONEDA";
+    }
+    
+    private bool PuedeDarCambio(int cambio)
+    {
+        var copia = new Dictionary<Moneda, int>(_cajaMonedas);
+        int restante = cambio;
+
+        foreach (var moneda in new[] { Moneda.Quarter, Moneda.Dime, Moneda.Nickel })
+        {
+            int valor = ValuarMoneda(moneda);
+
+            while (restante >= valor && copia[moneda] > 0)
+            {
+                copia[moneda]--;
+                restante -= valor;
+            }
+        }
+
+        return restante == 0;
     }
 }
 
