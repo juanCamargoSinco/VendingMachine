@@ -153,7 +153,7 @@ public class VendingMachineTests
     }
 
     [Fact]
-    public void Cuando_UsuarioInserta70YSeleccionaCandy_Debe_PantallaMostrarGraciasDispensarColaYEntregar5Cambio()
+    public void Cuando_UsuarioInserta70YSeleccionaCandy_Debe_PantallaMostrarGraciasDispensarCandyYEntregar5Cambio()
     {
         var maquina = new VendingMachine();
         maquina.InsertarMoneda(Moneda.Quarter);
@@ -167,6 +167,23 @@ public class VendingMachineTests
         maquina.BandejaProductos.Should().Contain(Producto.Candy);
         maquina.SaldoBandeja.Should().Be(5);
     }
+
+    [Fact]
+    public void Cuando_UsuarioInserta90YSeleccionaChips_Debe_PantallaMostrarGraciasDispensarChipsYEntregar40Cambio()
+    {
+        var maquina = new VendingMachine();
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Quarter);
+        maquina.InsertarMoneda(Moneda.Dime);
+        maquina.InsertarMoneda(Moneda.Nickel);
+
+        maquina.SeleccionarProducto(Producto.Chips);
+
+        maquina.Pantalla.Should().Be("Gracias");
+        maquina.BandejaProductos.Should().Contain(Producto.Chips);
+        maquina.SaldoBandeja.Should().Be(40);
+    }
 }
 
 public enum Producto
@@ -178,7 +195,7 @@ public enum Producto
 
 public class VendingMachine
 {
-    private Dictionary<Producto, decimal> _productos = new()
+    private Dictionary<Producto, int> _productos = new()
     {
         { Producto.Cola, 100 },
         { Producto.Chips, 50 },
@@ -232,10 +249,42 @@ public class VendingMachine
             BandejaProductos.Add(producto);
             var vueltas = Saldo - precio;
             if (vueltas > 0)
-                BandejaDevolucion.Add(Moneda.Nickel);
+            {
+                var listaVueltas = ObtenerCambio(vueltas);
+                foreach (var moneda in listaVueltas)
+                {
+                    BandejaDevolucion.Add(moneda);
+                }
+            }
         }
         else
             Pantalla = $"PRECIO ${precio}";
+    }
+
+    public List<Moneda> ObtenerCambio(int cambio)
+    {
+        var monedas = new List<Moneda>();
+        int saldoRestante = cambio;
+
+        while (saldoRestante >= 25)
+        {
+            monedas.Add(Moneda.Quarter);
+            saldoRestante -= 25;
+        }
+
+        while (saldoRestante >= 10)
+        {
+            monedas.Add(Moneda.Dime);
+            saldoRestante -= 10;
+        }
+
+        while (saldoRestante >= 5)
+        {
+            monedas.Add(Moneda.Nickel);
+            saldoRestante -= 5;
+        }
+
+        return monedas;
     }
 }
 
