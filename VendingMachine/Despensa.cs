@@ -27,7 +27,7 @@ public class Despensa
 
     public bool ProductoEstaAgotado(Producto producto) => _inventario[producto] == 0;
 
-    public void DispensarProducto(Producto producto)
+    public void EntregarProducto(Producto producto)
     {
         BandejaProductos.Add(producto);
         _inventario[producto] -= 1;

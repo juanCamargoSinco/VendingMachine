@@ -28,28 +28,26 @@ public class VendingMachine(
     {
         var precio = _despensa.ObtenerPrecioProducto(producto);
         var cambio = _monedero.Saldo - precio;
-        var saldoSuficiente = _monedero.Saldo < precio;
+        var saldoEsSuficiente = _monedero.Saldo >= precio;
 
         if (_despensa.ProductoEstaAgotado(producto))
             _pantalla.CambiarAAgotado();
-        else if (saldoSuficiente)
+        else if (saldoEsSuficiente == false)
             _pantalla.CambiarAPrecio(precio);
         else if (_monedero.PuedeDarCambio(cambio) == false)
             _pantalla.CambiarACambioExacto();
         else
             ProcesarCompra(producto, cambio);
     }
-
-    private void ProcesarCompra(Producto producto, int cambio)
-    {
-        _despensa.DispensarProducto(producto);
-        _pantalla.CambiarAGracias();
-        _monedero.DevolverSaldo(cambio);
-    }
-
     public void DevolverCambio()
     {
         _monedero.DevolverSaldo(_monedero.Saldo);
         _pantalla.CambiarAInsertarMoneda();
+    }
+    private void ProcesarCompra(Producto producto, int cambio)
+    {
+        _despensa.EntregarProducto(producto);
+        _pantalla.CambiarAGracias();
+        _monedero.DevolverSaldo(cambio);
     }
 }
